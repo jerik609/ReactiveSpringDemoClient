@@ -23,6 +23,7 @@ public class RoutesConfiguration {
         return route()
                 .GET("/proxiedProducts", request ->
                                 ok()
+                                // this sort of works even without the content type
                                 .contentType(MediaType.TEXT_EVENT_STREAM)
                                 .body(productProxy.getAll(), Product.class)
                         )
