@@ -1,0 +1,1 @@
+counterpart (client) to the ReactiveSpringDemo server application
