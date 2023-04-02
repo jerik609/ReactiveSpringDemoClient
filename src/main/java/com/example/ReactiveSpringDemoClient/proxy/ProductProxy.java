@@ -20,8 +20,8 @@ public class ProductProxy {
     private final WebClient webClient;
 
     public Flux<Product> getAll() {
-        return webClient.get().uri("/product2").exchangeToFlux(
-                clientResponse -> clientResponse.bodyToFlux(Product.class)
+        return webClient.get().uri("/product2")
+                .exchangeToFlux(clientResponse -> clientResponse.bodyToFlux(Product.class)
         );
     }
 

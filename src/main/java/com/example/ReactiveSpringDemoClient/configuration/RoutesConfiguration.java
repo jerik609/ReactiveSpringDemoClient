@@ -29,6 +29,4 @@ public class RoutesConfiguration {
                 .build();
     }
 
-
-
 }
