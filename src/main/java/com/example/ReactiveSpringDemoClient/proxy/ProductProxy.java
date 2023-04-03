@@ -28,6 +28,7 @@ public class ProductProxy {
 
         return webClient.get().uri("/product2")
                 .exchangeToFlux(clientResponse -> clientResponse.bodyToFlux(Product.class))
+                // this is called a validation - for any event I receive, I apply this validation
                 .doOnNext(p -> {
                     if (p.getName() == null) throw new NullNameProductException();
                 })
@@ -53,13 +54,18 @@ public class ProductProxy {
                 //  where this exceptionhandler is the standard rest controller advice-backed exception handler
                 // useful when we want to treat the technical exceptions which happened here somewhere else (by an existing error handler?)
                 .onErrorMap(e -> e instanceof WebClientRequestException, e -> new ProductRetrieveException())
-
+                // continue = drop event and continue with next method (again there are 3 overloads)
                 // e.g. we have an exception and an object on which we failed = and abnormal event, this method
                 //  allows us to just skip the event, just drop it (and log it or something)
-                .onErrorContinue(e -> e instanceof NullNameProductException, (x, o) -> {
-                    System.out.println("Received a null name product: " + ((Product)o).getId());
+                .onErrorContinue(e -> e instanceof NullNameProductException, (exception, failedObject) -> {
+                    System.out.println("Received a null name product: " + ((Product)failedObject).getId());
                 } )
-                ;
+                // retry - with network based services, just try to perform the action again, assuming this
+                //  error was caused by a temporary glitch typically on the network
+                .retry(10);
+
+        // there are cases when we want to apply a circuit breaker - webclient does not have that out of the box
+
     }
 
 }
